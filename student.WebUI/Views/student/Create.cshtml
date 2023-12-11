@@ -1,0 +1,162 @@
+﻿@model StudentLibrary.StudentViewModel
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper "*, Microsoft.AspNet.Mvc.TagHelpers"
+@addTagHelper "*, MVC_TagHelper"
+
+<h1 style="color:green" width="100px" align="center"> @ViewBag.title</h1>
+<hr />
+<div class="row">
+    <div class="col-md-5">
+        <form asp-action="@ViewBag.action" asp-controller="student" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="StudentFirstName" class="control-label"></label>
+                <input asp-for="StudentFirstName" class="form-control" />
+                <span asp-validation-for="StudentFirstName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StudentMiddleName" class="control-label"></label>
+                <input asp-for="StudentMiddleName" class="form-control" />
+                <span asp-validation-for="StudentMiddleName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StudentLastName" class="control-label"></label>
+                <input asp-for="StudentLastName" class="form-control" />
+                <span asp-validation-for="StudentLastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ParentFirstName" class="control-label"></label>
+                <input asp-for="ParentFirstName" class="form-control" />
+                <span asp-validation-for="ParentFirstName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ParentLastName" class="control-label"></label>
+                <input asp-for="ParentLastName" class="form-control" />
+                <span asp-validation-for="ParentLastName" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label asp-for="@Model.StateId" for="State">State</label>
+                <div class="form-select">
+                    <select class="form-control" asp-for="StateId" onchange="GetCities(this.value)" asp-items="@(new SelectList(ViewBag.States,"StateId","StateName"))">
+                        <option value="">--Select State--</option>
+                    </select>
+                    <span class="select-icon"></span>
+                    <span asp-validation-for="StateId" class="text-danger"></span>
+                </div>
+            </div>
+
+            @{
+                if (Model.CityId != 0)
+                {
+                    //<div class="form-group">
+                    //    <label asp-for="CityId" class="control-label"></label>
+                    //    <option value="">--Select--</option>
+                    //    @if (Model.StudentId > 0 && ViewBag.Cityy != null)
+                    //    {
+                    //        @foreach (var item in ViewBag.Cityy)
+                    //        {
+                    //            <option value="@item.CityId">@item.CityName</option>
+                    //        }
+                    //    }
+                    //    <span asp-validation-for="CityId" class="text-danger"></span>
+                    //</div>
+                    <div class="form-group">
+                        <label asp-for="CityId" class="control-label"></label>
+                        <select asp-for="CityId" class="form-control" asp-items="@(new SelectList(ViewBag.Cityy,"CityId","CityName"))">
+                            <option value="">------Select------</option>
+                        </select>
+                        <span asp-validation-for="CityId" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        <label asp-for="CityId" class="control-label"></label>
+                        <select asp-for="CityId" class="form-control">
+                            <option value="">--Select City--</option>
+                        </select>
+                        <span asp-validation-for="CityId" class="text-danger"></span>
+                    </div>
+                }
+            }
+
+            <div class="form-group">
+                <label asp-for="@Model.Email" class="control-label"></label>
+                <input asp-for="@Model.Email" id="email" class="form-control" />
+                <span asp-validation-for="@Model.Email" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="@Model.ParentNumber" class="control-label"></label>
+                @* <input asp-for="@Model.ParentNumber" class="form-control" id="ParentNumber" />*@
+                @Html.EditorFor(model => model.ParentNumber, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ParentNumber, "", new { @class = "text-danger" })
+                @*  <input type="number" id="ParentNumber" class="form-control" />*@
+                <span asp-validation-for="@Model.ParentNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="@Model.Address" class="control-label"></label>
+                <textarea asp-for="@Model.Address" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="@Model.Address" class="text-danger"></span>
+            </div>
+
+
+
+
+            <div class="form-group d-block mt-5">
+                <input type="hidden" id="TXT_ImageData" name="TXT_ImageData" />
+                <input type="hidden" id="hdnProductId" asp-for="StudentId" />
+
+                <button type="submit" class="btn btn-primary" id="submit">@ViewBag.button</button>
+                <a value="Clear" asp-controller="Student" asp-action="Index" class="btn btn-warning">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script type="text/javascript">
+
+        function GetCities(StateId) {
+            var items = "<option selected value=''>--Select--</option>";
+            $('#CityId').html(items);
+            if (StateId != '') {
+                $.ajax({
+                    type: "GET",
+                    url: "@(Url.Action("GetCities", "student"))",
+                    data: { StateId: StateId },
+                    datatype: "json",
+                    success: function (data) {
+                        var items = "<option selected value=''>--Select city--</option>";
+                        $.each(data, function (i, item) {
+                            console.log(data);
+                            console.log(item);
+                            items += "<option value='" + item.cityId + "'>" + item.cityName + "</option>";
+                        });
+                        $('#CityId').html(items);
+                    }
+                });
+            }
+        }
+    </script>
+}

@@ -1,0 +1,293 @@
+﻿@model StudentLibrary.StudentViewModel
+
+
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<p>
+    <a asp-action="Create" class="btn btn-sm btn-primary rounded-0 text-uppercase"><i class="fas fa-plus-circle"></i> Add New</a>
+</p>
+
+<partial name="_PopupBlock" />
+
+<div style="width:100%; margin:0 auto">
+    <div style="background-color:white; padding:30px">
+        <div style="width:100%; margin:0 auto">
+            <form enctype="multipart/form-data" class="col-6">
+
+
+                <div class="form-group">
+                    <label asp-for="StudentFirstName" class="control-label"></label>
+                    <input asp-for="StudentFirstName" id="StudentFirstName" class="form-control" />
+                   
+                </div>
+
+                <div>
+                    <label asp-for="StateId">StateName</label>
+                    <div>
+                        <select class="form-control" asp-for="StateId" onchange="GetCities(this.value)" asp-items="@(new SelectList(ViewBag.States,"StateId","StateName"))">
+                            <option value="">--Select State --</></option>
+                        </select>
+                        <span class="select-icon"></span>
+                    </div>
+
+                </div>
+                <div>
+                    <label asp-for="CityId">CityName</label>
+                    <div>
+                        <select class="form-control" asp-for="CityId">
+                            <option value="">--Select City--</></option>
+                        </select>
+                        <span class="select-icon"></span>
+                    </div>
+                   
+                </div>
+            </form>
+            <div class="mt-3">
+                <div class="form-group d-inline-block mt-2">
+                    @*<button type="button" id="Search" class="btn btn-success btn-md">Search</button>*@
+                    <button class="btn btn-md btn-primary rounded-0 text-uppercase" id="Search">Search</button>
+                </div>
+                <div class="form-group d-inline-block  mt-2">
+                 
+                    <button class="btn btn-md btn-primary rounded-0 text-uppercase" id="clear">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tableView">
+    <table id="myTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th class="d-none">StudentId</th>
+                <th>Student First Name</th>
+                <th>Student Middle Name</th>
+                <th>Student Last Name</th>
+                <th>Parent First Name</th>
+                <th>Parent Last Name</th>
+                <th>State</th>
+                <th>City</th>
+                <th>Address</th>
+                <th>Email</th>
+                <th>ParentNumber</th>
+                <th>Action</th>
+
+            </tr>
+        </thead>
+    </table>
+</div>
+
+@*Links to create JQUERY Data table*@
+
+<link href="~/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+@section Scripts
+    {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+  
+    <script>
+        // Jquery data table to bind objects
+
+        function BindStudentGrid(value) {
+            $("#myTable").DataTable({
+                "processing": true,
+                "language": {
+                    "processing": '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span> '
+                },
+                "scrollX": true,
+                "filter": false,
+                "searching": false,
+                "serverSide": true,
+                "orderMulti": false,
+                "ajax": value,
+                "columns": [
+
+
+                    { "data": "studentId", "name": "StudentId", "visible": false },
+                    { "data": "studentFirstName", "name": "StudentFirstName", "autoWidth": false, "Width": "100px !important" },
+                    { "data": "studentMiddleName", "name": "StudentMiddleName", "autoWidth": true },
+                    { "data": "studentLastName", "name": "StudentLastName", "autoWidth": true },
+                    { "data": "parentFirstName", "name": "ParentFirstName", "autoWidth": true },
+                    { "data": "parentLastName", "name": "ParentLastName", "autoWidth": true },
+                    { "data": "stateName", "name": "State", "autoWidth": false },
+                    { "data": "cityName", "name": "City", "autoWidth": true },
+
+                    { "data": "address", "name": "Address" },
+                    { "data": "email", "name": "Email", "sortable": true, "autoWidth": true },
+                    { "data": "parentNumber", "name": "ParentNumber", "sortable": true, "autoWidth": true },
+                    {
+                        data: "studentId",
+                        "sortable": false,
+                        "width": "150px",
+                        render: function (data, type, row) {
+                            return "<span ><a href='/Student/Edit?id=" + data + "' ><i class='fa fa-edit btn btn-success'></i></a> <a onclick='DeleteStudent(" + data + ")' ><i class='fa fa-trash btn btn-danger'></i></a></span>";
+                        },
+                        "autoWidth": true
+                    },
+
+                ]
+            });
+        }
+
+        // to fetch all The students from the database
+
+        $(document).ready(function () {
+            var value = {
+                "url": "/student/FetchAllStudent",
+                "type": "POST",
+                "datatype": "json"
+            };
+
+            BindStudentGrid(value);
+            $('#Search').click(function () {
+                $('#myTable').DataTable().clear().destroy();
+                $("#myTable").dataTable().fnDestroy();
+                var datavalue = {
+                    "FirstName": $("#StudentFirstName").val(),
+                    "StateId": $("#StateId").val(),
+                    "CityId": $("#CityId").val(),
+                };
+
+                var urlvalue = {
+                    "url": "/student/Search",
+                    "type": "POST",
+                    data: datavalue,
+                    "datatype": "json"
+                };
+                BindStudentGrid(urlvalue);
+            });
+        });
+        // CITY and STATE change
+
+        function GetCities(StateId) {
+            var items = "<option selected value=''>--Select--</option>";
+            $('#CityId').html(items);
+            if (StateId != '') {
+                $.ajax({
+                    type: "GET",
+                    url: "@(Url.Action("GetCities", "student"))",
+                    data: { StateId: StateId },
+                    datatype: "json",
+                    success: function (data) {
+                        var items = "<option selected value=''>--Select city--</option>";
+                        $.each(data, function (i, item) {
+                            console.log(data);
+                            console.log(item);
+                            items += "<option value='" + item.cityId + "'>" + item.cityName + "</option>";
+                        });
+                        $('#CityId').html(items);
+                    }
+                });
+            }
+        }
+        $(document).ready(function () {
+            var message = "@ViewBag.message";
+
+            // Update or Edit student popup
+
+            if (message == "Updated Student Successfully") {
+                $(".modalMessage").html("Updated Student Successfully");
+                $(".modalMessage").addClass("text-success");
+                $("#cancle").hide();
+                $('#popupModel').modal('show');
+            }
+
+            //Add Student data popup
+
+            if (message == "Added Student Successfully") {
+                $(".modalMessage").html("Added Student Successfully");
+                $(".modalMessage").addClass("text-success");
+                $("#cancle").hide();
+                $('#popupModel').modal('show');
+            }
+        });
+
+        // Clear all the records from the datatable
+        $('#clear').click(function () {
+            $('#myTable').DataTable().clear().destroy();
+            $("#StudentFirstName").val("");
+            $("#StateId").val("");
+            $("#CityId").empty();
+            $("#CityId").html('<option value="">------Select------</option>');
+            var value = {
+                "url": "/student/FetchAllStudent",
+                "type": "POST",
+                "datatype": "json"
+            };
+            BindStudentGrid(value);
+        })
+
+        // State and City Drop Down
+
+        $("#StateId").on("change", function () {
+            var stateValue = $("#StateId").val();
+
+            if (stateValue != "") {
+                $.ajax({
+                    url: "https://localhost:44377/StudentAPI/GetCities?stateId=" + stateValue,
+                    method: "GET",
+                    contentType: "application/json",
+                    datatype: "json",
+                    success: function (data) {
+                        //empty privious dropdown list data
+                        $('#CityId').empty();
+                        $('#CityId').append($('<option></option>').val("").html("------Select------"));
+
+                        for (var i = 0; i < data.length; i++) {
+                            $('#CityId').append($('<option></option>').val(data[i].cityId).html(data[i].cityName));
+                        }
+                    },
+                    error: function () {
+                        $("#msg").html("Error while making Ajax call!");
+                    },
+                });
+            }
+            else {
+                $('#CityId').empty();
+                $('#CityId').append($('<option></option>').val("").html("------Select------"));
+            }
+        })
+
+        //  Delete Student from The datatable
+
+        function DeleteStudent(StudentId) {
+            $(document).ready(function myfunction() {
+                $(".modalMessage").html("Are you sure you want to delete this student?");
+                $(".modalMessage").addClass("text-danger");
+                $("#cancel").show();
+                $('#popupModel').modal('show');
+                $('#ok').click(function () {
+                    $.ajax({
+                        url: "/student/Delete?id=" + StudentId,
+                        method: "GET",
+                        contentType: "application/json",
+                        datatype: "json",
+                        success: function (data) {
+                            if (data == true) {
+                                $('#myTable').DataTable().clear().draw();
+                            }
+                            $(".modalMessage").html("Deleted Student Successfully");
+                            $(".modalMessage").addClass("text-success");
+                            $("#cancleDelete").hide();
+                            $('#popupModelDelete').modal('show');
+                        },
+                        error: function () {
+                            $("#msg").html("Error while making Ajax call!");
+                        },
+                    });
+                });
+            })
+        };
+
+
+    </script>
+}
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js" defer="defer"></script>
+

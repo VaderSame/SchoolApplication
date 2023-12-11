@@ -1,0 +1,46 @@
+[17:07:15 INF] Application is starting
+[17:07:16 INF] User profile is available. Using 'C:\Users\ROCKS6\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[17:07:16 INF] Application started. Press Ctrl+C to shut down.
+[17:07:16 INF] Hosting environment: Development
+[17:07:16 INF] Content root path: D:\projects\Semal_Identity\SchoolStudentAPI
+[17:07:16 INF] Request starting HTTP/2.0 GET https://localhost:44377/weatherforecast  
+[17:07:16 INF] Executing endpoint 'SchoolStudentApi.Controllers.WeatherForecastController.Index (School.API)'
+[17:07:16 INF] Route matched with {action = "Index", controller = "WeatherForecast"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index() on controller SchoolStudentApi.Controllers.WeatherForecastController (School.API).
+[17:07:16 INF] Executing ContentResult with HTTP Response ContentType of text/html
+[17:07:16 INF] Executed action SchoolStudentApi.Controllers.WeatherForecastController.Index (School.API) in 15.1387ms
+[17:07:16 INF] Executed endpoint 'SchoolStudentApi.Controllers.WeatherForecastController.Index (School.API)'
+[17:07:16 INF] HTTP GET /weatherforecast responded 200 in 67.0881 ms
+[17:07:16 INF] Request finished in 98.6674ms 200 text/html
+[17:07:18 INF] Request starting HTTP/1.1 GET https://localhost:44377/api/Students/GetState?StateName=  
+[17:07:18 INF] Executing endpoint 'SchoolStudentApi.Controllers.StudentsController.GetState (School.API)'
+[17:07:18 INF] Route matched with {action = "GetState", controller = "Students"}. Executing controller action with signature System.Collections.Generic.List`1[StudentLibrary.State] GetState(System.String) on controller SchoolStudentApi.Controllers.StudentsController (School.API).
+[17:07:18 INF] Entity Framework Core 3.1.32 initialized 'StudentDB_SemalContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+[17:07:19 INF] Executed DbCommand (17ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [s].[StateId], [s].[StateName]
+FROM [State] AS [s]
+[17:07:19 INF] Executing ObjectResult, writing value of type 'System.Collections.Generic.List`1[[StudentLibrary.State, School.Entities.Library, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+[17:07:19 INF] Executed action SchoolStudentApi.Controllers.StudentsController.GetState (School.API) in 1314.1719ms
+[17:07:19 INF] Executed endpoint 'SchoolStudentApi.Controllers.StudentsController.GetState (School.API)'
+[17:07:19 INF] HTTP GET /api/Students/GetState responded 200 in 1323.9501 ms
+[17:07:19 INF] Request finished in 1326.2375ms 200 application/json; charset=utf-8
+[17:07:19 INF] Request starting HTTP/1.1 POST https://localhost:44377/api/Students/FetchAllStudent application/json; charset=utf-8 492
+[17:07:19 INF] Executing endpoint 'SchoolStudentApi.Controllers.StudentsController.FetchAllStudent (School.API)'
+[17:07:19 INF] Route matched with {action = "FetchAllStudent", controller = "Students"}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult FetchAllStudent(StudentWebAPI.SchoolStudentApiModel) on controller SchoolStudentApi.Controllers.StudentsController (School.API).
+[17:07:20 INF] Entity Framework Core 3.1.32 initialized 'StudentDB_SemalContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+[17:07:20 INF] Executed DbCommand (3ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM [StudentTables] AS [s]
+INNER JOIN [City] AS [c] ON [s].[CityId] = [c].[CityId]
+INNER JOIN [State] AS [s0] ON [s].[StateId] = [s0].[StateId]
+[17:07:20 INF] Executed DbCommand (39ms) [Parameters=[@__p_0='?' (DbType = Int32), @__p_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [s].[StudentFirstName], [s].[StudentLastName], [s].[StudentMiddleName], [s].[ParentLastName], [s].[ParentFirstName], [s].[ParentNumber], [s].[StudentId], [c].[CityName], [c].[CityId], [s0].[StateId], [s0].[StateName], [s].[Address], [s].[Email]
+FROM [StudentTables] AS [s]
+INNER JOIN [City] AS [c] ON [s].[CityId] = [c].[CityId]
+INNER JOIN [State] AS [s0] ON [s].[StateId] = [s0].[StateId]
+ORDER BY [s].[StudentFirstName]
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+[17:07:20 INF] Executing ObjectResult, writing value of type 'System.Collections.Generic.List`1[[StudentWebAPI.SchoolStudentApiModel, School.Entities.Library, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+[17:07:20 INF] Executed action SchoolStudentApi.Controllers.StudentsController.FetchAllStudent (School.API) in 143.026ms
+[17:07:20 INF] Executed endpoint 'SchoolStudentApi.Controllers.StudentsController.FetchAllStudent (School.API)'
+[17:07:20 INF] HTTP POST /api/Students/FetchAllStudent responded 200 in 147.2242 ms
+[17:07:20 INF] Request finished in 148.9416ms 200 application/json; charset=utf-8
